@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: ProbeAI Orchestration API
+  version: 1.0.0
+paths:
+  /api/research:
+    post:
+      summary: Start a new research session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  example: "Impact of quantum computing on cryptography"
+                mode:
+                  type: string
+                  enum: [quick_scan, deep_probe]
+                  description: "Optional override for research mode"
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchSession'
+
+  /api/research/{id}:
+    get:
+      summary: Get session status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchSession'
+    
+    patch:
+      summary: Update session (e.g., Approve Plan)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [approve]
+      responses:
+        '200':
+          description: Session updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchSession'
+
+components:
+  schemas:
+    ResearchSession:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [idle, analyzing, planning, review_pending, executing, completed, error]
+        mode:
+          type: string
+          enum: [quick_scan, deep_probe]
+        plan:
+          type: object
+          properties:
+            rationale: 
+              type: string
+            steps:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  description:
+                    type: string

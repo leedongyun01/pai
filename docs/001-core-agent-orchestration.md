@@ -1,0 +1,6 @@
+- **설명**: 사용자의 입력을 분석하여 'Quick Scan'과 'Deep Probe' 모드를 결정하고, 구체적인 리서치 계획(Sub-tasks)을 수립하는 핵심 로직입니다.
+- **우선순위 이유**: 모든 리서치 작업의 시작점이며, Constitution의 **제1원칙(Autonomous Execution)**과 **제4원칙(Dual-Mode Operation)**을 정의하는 기반이 됩니다.
+- **핵심 명세 항목**: 
+  - 질의 의도 분류 알고리즘
+  - 리서치 플랜 생성 프롬프트 전략
+  - 에이전트 상태 머신(State Machine) 정의

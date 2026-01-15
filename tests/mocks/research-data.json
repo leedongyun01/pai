@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://example.com/ai-trends-2026",
+    "title": "AI Trends in 2026: The Rise of Autonomous Agents",
+    "content": "In 2026, autonomous agents have become the primary interface for software development. These agents can plan, execute, and verify complex tasks with minimal human intervention. The integration of multi-modal models has further enhanced their capabilities.",
+    "queryMatch": "AI trends 2026 autonomous agents",
+    "timestamp": "2026-01-10T10:00:00Z",
+    "score": 0.95
+  },
+  {
+    "url": "https://tech-news.net/agentic-workflows",
+    "title": "Agentic Workflows: A New Paradigm",
+    "content": "Agentic workflows are replacing traditional CI/CD pipelines. Instead of static scripts, dynamic agents now orchestrate the entire lifecycle of an application, from requirements gathering to deployment. Some experts argue this reduces human oversight too much.",
+    "queryMatch": "agentic workflows software development",
+    "timestamp": "2026-01-12T14:30:00Z",
+    "score": 0.88
+  },
+  {
+    "url": "https://industry-report.com/dev-tools",
+    "title": "Developer Tools Market Report 2026",
+    "content": "The market for AI-powered developer tools is expected to reach $50 billion by 2027. While most developers embrace these tools, there is a growing concern about 'hallucination drift' where agents produce confident but incorrect code in complex environments.",
+    "queryMatch": "AI developer tools market 2026",
+    "timestamp": "2026-01-15T09:00:00Z",
+    "score": 0.92
+  }
+]
