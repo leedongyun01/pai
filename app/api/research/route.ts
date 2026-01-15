@@ -16,12 +16,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { query } = await req.json();
+    const { query, autoPilot } = await req.json();
     if (!query) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    const session = await createSession(query);
+    const session = await createSession(query, { autoPilot });
     return NextResponse.json(session, { status: 201 });
   } catch (error) {
     console.error('Error creating session:', error);

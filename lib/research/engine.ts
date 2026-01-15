@@ -74,6 +74,7 @@ export class ResearchEngine {
     }
 
     const searchSteps = updatedSession.plan.steps.filter(s => s.type === 'search');
+    let capturedAnswer: string | undefined;
 
     for (const step of searchSteps) {
       if (!step.searchQueries || step.searchQueries.length === 0) continue;
@@ -83,10 +84,14 @@ export class ResearchEngine {
       const researchTasks = step.searchQueries.map((queryText) => 
         this.limit(async () => {
           try {
-            const results = await searchAndExtract(queryText, {
+            const { results, answer } = await searchAndExtract(queryText, {
               searchDepth: updatedSession.mode === "deep_probe" ? "advanced" : "basic",
               maxResults: updatedSession.mode === "deep_probe" ? 10 : 5
             });
+            
+            if (answer && !capturedAnswer) {
+              capturedAnswer = answer;
+            }
             
             return results;
           } catch (error) {
@@ -118,6 +123,7 @@ export class ResearchEngine {
     }
 
     updatedSession.results = Array.from(resultsMap.values());
+    updatedSession.tavilyAnswer = capturedAnswer;
     updatedSession.status = "completed";
     updatedSession.updatedAt = new Date().toISOString();
     

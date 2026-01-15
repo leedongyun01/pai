@@ -4,5 +4,8 @@
       "url": "https://mcp.supabase.com/mcp",
       "type": "http"
     }
+  },
+  "experimental": {
+    "skills": true
   }
 }

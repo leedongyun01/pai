@@ -22,7 +22,7 @@ vi.mock('@/lib/research/scraper', () => ({
   searchAndExtract: vi.fn().mockImplementation(async () => {
     // Simulate Tavily latency
     await new Promise(resolve => setTimeout(resolve, 1000));
-    return [{ url: 'https://test.com', title: 'Test', content: 'Content', queryMatch: 'query', timestamp: new Date().toISOString(), score: 0.9 }];
+    return { results: [{ url: 'https://test.com', title: 'Test', content: 'Content', queryMatch: 'query', timestamp: new Date().toISOString(), score: 0.9 }] };
   }),
 }));
 

@@ -14,18 +14,20 @@ Provide a brief rationale for your choice.
 `;
 
 export async function analyzeQuery(query: string): Promise<AnalysisResult> {
-  /*
-  const { object } = await generateObject({
-    model: google('gemini-2.5-flash'),
-    schema: AnalysisSchema,
-    prompt: query,
-    system: SYSTEM_PROMPT,
-  });
+  try {
+    const { object } = await generateObject({
+      model: google('gemini-1.5-flash-latest'),
+      schema: AnalysisSchema,
+      prompt: query,
+      system: SYSTEM_PROMPT,
+    });
 
-  return object;
-  */
-  return {
-    mode: 'quick_scan',
-    rationale: 'Gemini is temporarily disabled. Defaulting to quick_scan.',
-  };
+    return object;
+  } catch (error) {
+    console.warn('Failed to analyze with Gemini, using fallback:', error);
+    return {
+      mode: 'quick_scan',
+      rationale: 'Gemini is temporarily unavailable. Defaulting to quick_scan.',
+    };
+  }
 }

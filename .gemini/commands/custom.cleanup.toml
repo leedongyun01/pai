@@ -1,9 +1,9 @@
 description = "Cleanup"
 
 prompt = """
-double check if you have implemented the specification as intended.\ 
-clean up dead & old codes.\
-check if there in any overengineering.\
-check if Testing code covers overall > 80%
-commit, push, pr
+1. double check if you have implemented the specification as intended.\ 
+2. clean up dead & old codes.\
+3. check if there in any overengineering.\
+4. check if Testing code covers overall > 80%
+5. commit, push, pr, merge
 """

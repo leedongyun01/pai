@@ -3,10 +3,30 @@ import { createSession, updateSessionStatus } from '@/lib/orchestrator';
 import * as sessionStore from '@/lib/storage/session-store';
 import * as analyzer from '@/lib/agents/analyzer';
 import * as planner from '@/lib/agents/planner';
+import { ResearchEngine } from '@/lib/research/engine';
+import { Synthesizer } from '@/lib/research/synthesizer';
 
 vi.mock('@/lib/storage/session-store');
 vi.mock('@/lib/agents/analyzer');
 vi.mock('@/lib/agents/planner');
+vi.mock('@/lib/research/engine', () => ({
+  ResearchEngine: vi.fn().mockImplementation(function() {
+    return {
+      execute: vi.fn().mockImplementation(async (session) => ({
+        ...session,
+        status: 'completed',
+        results: [{ url: 'http://test.com', title: 'Test', content: 'Content' }]
+      }))
+    };
+  })
+}));
+vi.mock('@/lib/research/synthesizer', () => ({
+  Synthesizer: vi.fn().mockImplementation(function() {
+    return {
+      synthesize: vi.fn().mockResolvedValue({ title: 'Test Report' })
+    };
+  })
+}));
 
 describe('Orchestrator', () => {
   beforeEach(() => {
@@ -22,6 +42,12 @@ describe('Orchestrator', () => {
       rationale: 'Quick plan',
       steps: [{ id: '1', type: 'search', description: 'Step 1' }],
     });
+
+    let savedSession: any;
+    vi.mocked(sessionStore.saveSession).mockImplementation(async (session) => {
+      savedSession = session;
+    });
+    vi.mocked(sessionStore.getSession).mockImplementation(async () => savedSession);
 
     const session = await createSession('Test query');
     

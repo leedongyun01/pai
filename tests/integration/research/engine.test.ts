@@ -22,8 +22,8 @@ describe('Research Engine Orchestration', () => {
     ];
 
     (scraper.searchAndExtract as any)
-      .mockResolvedValueOnce([mockResults[0]])
-      .mockResolvedValueOnce([mockResults[1]]);
+      .mockResolvedValueOnce({ results: [mockResults[0]] })
+      .mockResolvedValueOnce({ results: [mockResults[1]] });
 
     const session: ResearchSession = {
       id: '123e4567-e89b-12d3-a456-426614174000',
@@ -53,7 +53,7 @@ describe('Research Engine Orchestration', () => {
 
   it('should handle partial failures gracefully', async () => {
     (scraper.searchAndExtract as any)
-      .mockResolvedValueOnce([{ url: 'https://test1.com', title: 'Test 1', content: 'Content 1', queryMatch: 'query 1', timestamp: new Date().toISOString(), score: 0.9 }])
+      .mockResolvedValueOnce({ results: [{ url: 'https://test1.com', title: 'Test 1', content: 'Content 1', queryMatch: 'query 1', timestamp: new Date().toISOString(), score: 0.9 }] })
       .mockRejectedValueOnce(new Error('Search failed'));
 
     const session: ResearchSession = {
@@ -84,9 +84,9 @@ describe('Research Engine Orchestration', () => {
 
   it('should enforce 20,000 character limit per extracted page', async () => {
     const longContent = 'A'.repeat(25000);
-    (scraper.searchAndExtract as any).mockResolvedValueOnce([
-      { url: 'https://test.com', title: 'Test', content: longContent, queryMatch: 'query', timestamp: new Date().toISOString(), score: 0.9 }
-    ]);
+    (scraper.searchAndExtract as any).mockResolvedValueOnce({
+      results: [{ url: 'https://test.com', title: 'Test', content: longContent, queryMatch: 'query', timestamp: new Date().toISOString(), score: 0.9 }]
+    });
 
     const session: ResearchSession = {
       id: '123e4567-e89b-12d3-a456-426614174001',

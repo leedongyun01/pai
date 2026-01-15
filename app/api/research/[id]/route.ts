@@ -23,22 +23,3 @@ export async function GET(req: NextRequest, context: RouteContext) {
     );
   }
 }
-
-export async function PATCH(req: NextRequest, context: RouteContext) {
-  try {
-    const { id } = await context.params;
-    const { action } = await req.json();
-
-    if (action !== 'approve') {
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-    }
-
-    const session = await approvePlan(id);
-    return NextResponse.json(session);
-  } catch (error) {
-    return NextResponse.json(
-      { error: (error as Error).message || 'Failed to update session' }, 
-      { status: 500 }
-    );
-  }
-}

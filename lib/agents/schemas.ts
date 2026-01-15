@@ -17,5 +17,16 @@ export const ResearchPlanSchema = z.object({
   steps: z.array(PlanStepSchema),
 });
 
+export const UserFeedbackSchema = z.object({
+  timestamp: z.string(),
+  content: z.string(),
+});
+
+export const SessionSettingsSchema = z.object({
+  autoPilot: z.boolean(),
+});
+
 export type AnalysisResult = z.infer<typeof AnalysisSchema>;
 export type ResearchPlanResult = z.infer<typeof ResearchPlanSchema>;
+export type UserFeedback = z.infer<typeof UserFeedbackSchema>;
+export type SessionSettings = z.infer<typeof SessionSettingsSchema>;

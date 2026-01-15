@@ -9,7 +9,7 @@ import { SearchError } from "./engine";
 export async function searchAndExtract(
   query: string,
   options: { searchDepth?: "basic" | "advanced"; maxResults?: number } = {}
-): Promise<ResearchResult[]> {
+): Promise<{ results: ResearchResult[]; answer?: string }> {
   const apiKey = process.env.TAVILY_API_KEY;
 
   if (!apiKey || apiKey === "your_api_key_here") {
@@ -35,7 +35,7 @@ export async function searchAndExtract(
           api_key: apiKey,
           query,
           search_depth: options.searchDepth || "basic",
-          include_answer: false,
+          include_answer: true, 
           include_images: false,
           include_raw_content: false, 
           max_results: options.maxResults || 5,
@@ -52,21 +52,14 @@ export async function searchAndExtract(
       }
 
       const data = await response.json();
-      const results = data.results || [];
-
-      return results
+      const results = (data.results || [])
         .filter((res: any) => {
-          // FR-007: Skip binary/non-textual files based on URL extension
           const binaryExtensions = ['.pdf', '.zip', '.exe', '.dmg', '.mp4', '.mp3', '.jpg', '.png'];
           return !binaryExtensions.some(ext => res.url.toLowerCase().endsWith(ext));
         })
         .map((res: any) => {
-          // FR-005: Content cleaning (whitespace normalization)
           const rawContent = res.content || "";
-          const cleanedContent = rawContent
-            .replace(/\s+/g, ' ')
-            .trim();
-
+          const cleanedContent = rawContent.replace(/\s+/g, ' ').trim();
           return {
             url: res.url,
             title: res.title || "No Title",
@@ -76,6 +69,8 @@ export async function searchAndExtract(
             score: res.score || 0,
           };
         });
+
+      return { results, answer: data.answer };
     } catch (error) {
       lastError = error;
       if (error instanceof Error && error.name === 'AbortError') {

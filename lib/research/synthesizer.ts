@@ -53,35 +53,25 @@ export class Synthesizer {
       ? `${getSynthesisUserPrompt(session.query, sourcesForPrompt)}\n\nInclude the following detected conflicts in the report:\n${JSON.stringify(detectedConflicts)}`
       : getSynthesisUserPrompt(session.query, sourcesForPrompt);
 
-    /*
-    const { object: report } = await generateObject({
+    // Pass 2: Final Synthesis
+    const { object: reportData } = await generateObject({
       model: this.model,
       schema: ReportSchema,
       system: SYNTHESIS_SYSTEM_PROMPT,
       prompt: synthesisPrompt,
     });
-    */
 
     const report: Report = {
+      ...reportData,
       id: crypto.randomUUID(),
       sessionId: session.id,
-      title: `Research Report: ${session.query}`,
-      summary: "Gemini is temporarily disabled. This is a mock report summary.",
-      sections: [
-        {
-          title: "Introduction",
-          content: "This is a placeholder section because Gemini is disabled.",
-          citations: [],
-          subsections: [],
-        },
-      ],
       references: session.results.map((r, i) => ({
         ...r,
         id: r.id || `source_${i}`,
       })) as any,
       metadata: {
         generatedAt: new Date().toISOString(),
-        model: "mock-model",
+        model: "gemini-1.5-pro",
       },
     };
 

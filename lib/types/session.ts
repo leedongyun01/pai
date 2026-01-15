@@ -7,6 +7,7 @@ export type ResearchStatus =
   | 'analyzing'      // Determining mode
   | 'planning'       // Generating plan
   | 'review_pending' // Waiting for user approval (Deep Probe only)
+  | 'clarification_requested' // LLM needs more info
   | 'executing'      // Running tasks
   | 'completed'      // Finished
   | 'error';         // Failed
@@ -30,6 +31,11 @@ export interface ResearchPlan {
   steps: PlanStep[];
 }
 
+export interface UserFeedback {
+  timestamp: string; // ISO Date
+  content: string;
+}
+
 export interface ResearchResult {
   id: string;
   url: string;
@@ -45,9 +51,12 @@ export interface ResearchSession {
   query: string;
   mode: ResearchMode;
   status: ResearchStatus;
+  autoPilot?: boolean;
+  feedbackHistory?: UserFeedback[];
   plan?: ResearchPlan;
   results?: ResearchResult[];
   report?: Report;
+  tavilyAnswer?: string;
   createdAt: string; // ISO Date
   updatedAt: string; // ISO Date
   error?: string;

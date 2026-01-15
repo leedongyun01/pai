@@ -17,7 +17,7 @@ describe('Tavily Scraper', () => {
       json: async () => mockTavilyResponse,
     });
 
-    const results = await searchAndExtract('benefits of typescript');
+    const { results } = await searchAndExtract('benefits of typescript');
 
     expect(fetch).toHaveBeenCalledWith('https://api.tavily.com/search', expect.objectContaining({
       method: 'POST',
@@ -56,7 +56,7 @@ describe('Tavily Scraper', () => {
       }),
     });
 
-    const results = await searchAndExtract('test query');
+    const { results } = await searchAndExtract('test query');
     expect(results).toHaveLength(1);
     expect(results[0].url).toBe('https://example.com/404');
   });
@@ -77,7 +77,7 @@ describe('Tavily Scraper', () => {
       }),
     });
 
-    const results = await searchAndExtract('test query');
+    const { results } = await searchAndExtract('test query');
     expect(results[0].content).toBe('Too many spaces and tabs');
   });
 });
