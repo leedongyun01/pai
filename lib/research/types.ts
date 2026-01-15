@@ -60,4 +60,37 @@ export const ResearchSessionSchema = z.object({
 });
 export type ResearchSession = z.infer<typeof ResearchSessionSchema>;
 
-export type { Conflict, ReportSection, Report } from "./schemas";
+export type {
+  Conflict,
+  ReportSection,
+  Report,
+  VisualizationObject,
+  CitationMap,
+} from "./schemas";
+
+/**
+ * Interface for the Adaptive Visualization System
+ */
+export interface IVisualizer {
+  process(text: string): Promise<VisualizationObject[]>;
+  validate(code: string, type: "mermaid" | "table"): boolean;
+}
+
+/**
+ * Represents a segment of text identified for visualization
+ */
+export type TextFragment = {
+  text: string;
+  startIndex: number;
+  endIndex: number;
+};
+
+/**
+ * Result of the pattern matching logic
+ */
+export type PatternMatcherResult = {
+  candidates: TextFragment[];
+  recommendedType: string;
+  extractedData: any;
+  confidence: number;
+};

@@ -5,11 +5,13 @@ import { analyzeQuery } from './agents/analyzer';
 import { generatePlan } from './agents/planner';
 import { ResearchEngine } from './research/engine';
 import { Synthesizer } from './research/synthesizer';
+import { Visualizer } from './research/visualizer';
 
 const engine = new ResearchEngine();
 const synthesizer = new Synthesizer();
+const visualizer = new Visualizer();
 
-export async function createSession(query: string, options?: { autoPilot?: boolean }): Promise<ResearchSession> {
+export async function createSession(query: string, options?: { autoPilot?: boolean; mode?: ResearchMode }): Promise<ResearchSession> {
   if (!query || query.trim().length < 3) {
     throw new Error('Query is too short or empty');
   }
@@ -20,7 +22,7 @@ export async function createSession(query: string, options?: { autoPilot?: boole
   let session: ResearchSession = {
     id,
     query,
-    mode: 'quick_scan',
+    mode: options?.mode || 'quick_scan',
     status: 'analyzing',
     createdAt: now,
     updatedAt: now,
@@ -29,11 +31,26 @@ export async function createSession(query: string, options?: { autoPilot?: boole
   await saveSession(session);
 
   try {
-    // 1. Analyze
-    const analysis = await analyzeQuery(query);
+    // 1. Analyze (Skip if mode is explicitly quick_scan)
+    let analysis = { mode: session.mode, rationale: 'Mode explicitly set by user.' };
+    
+    if (!options?.mode) {
+      try {
+        analysis = await analyzeQuery(query);
+      } catch (e) {
+        console.warn('Analysis failed, falling back to quick_scan:', e);
+        analysis = { mode: 'quick_scan', rationale: 'Analysis failed, falling back to quick_scan.' };
+      }
+    }
+    
+    // FR-MODE: Force autoPilot based on mode
+    // Quick Scan is ALWAYS autoPilot: true, Deep Probe is ALWAYS autoPilot: false
+    const isAutoPilot = (analysis.mode === 'quick_scan');
+    
     session = {
       ...session,
       mode: analysis.mode,
+      autoPilot: isAutoPilot,
       status: 'planning',
       updatedAt: new Date().toISOString(),
     };
@@ -42,14 +59,8 @@ export async function createSession(query: string, options?: { autoPilot?: boole
     // 2. Plan
     const planResult = await generatePlan(query, analysis.mode);
     
-    // Default: ON for quick_scan, OFF for deep_probe. Override if provided.
-    const isAutoPilot = options?.autoPilot !== undefined 
-      ? options.autoPilot 
-      : (analysis.mode === 'quick_scan');
-    
     session = {
       ...session,
-      autoPilot: isAutoPilot,
       plan: {
         sessionId: id,
         rationale: planResult.rationale,
@@ -61,7 +72,7 @@ export async function createSession(query: string, options?: { autoPilot?: boole
     
     await saveSession(session);
 
-    // Auto-execute if status is executing
+    // Auto-execute if status is executing (Quick Scan)
     if (session.status === 'executing') {
       return executeResearch(id);
     }
@@ -148,7 +159,29 @@ export async function executeResearch(id: string): Promise<ResearchSession> {
     await saveSession(updatedSession);
     
     // Auto-synthesize report
-    await synthesizer.synthesize(id);
+    const report = await synthesizer.synthesize(id);
+    
+    // FR-006: Adaptive Visualization - Process each section for visualizations
+    const visualizations = [];
+    // Only run visualization for deep_probe mode to avoid Gemini usage in quick_scan
+    if (session.mode === 'deep_probe' && report && report.sections) {
+      for (const section of report.sections) {
+        try {
+          const sectionVisuals = await visualizer.process(section.content);
+          // Link visualization to its section title or id for placement
+          visualizations.push(...sectionVisuals.map(v => ({ ...v, sectionTitle: section.title })));
+        } catch (visError) {
+          console.error("Visualization failed for section:", section.title, visError);
+          // Continue without visualization
+        }
+      }
+    }
+
+    if (visualizations.length > 0) {
+      const sessionWithVisuals = await getSession(id) as ResearchSession;
+      sessionWithVisuals.visualizations = visualizations as any;
+      await saveSession(sessionWithVisuals);
+    }
     
     return await getSession(id) as ResearchSession;
   } catch (error) {

@@ -2,6 +2,7 @@ import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { ResearchPlanSchema, ResearchPlanResult, UserFeedback } from './schemas';
 import { ResearchMode, ResearchPlan } from '../types/session';
+import { AI_MODELS, isMockMode } from '../utils/ai';
 
 const SYSTEM_PROMPT = `
 You are the "Planner" agent for ProbeAI.
@@ -29,13 +30,43 @@ export async function generatePlan(
   previousPlan?: ResearchPlan, 
   feedback?: UserFeedback[]
 ): Promise<ResearchPlanResult> {
+  // US-MODE: Quick scan uses a fixed, simple plan to trigger Tavily's answer generation
+  if (mode === 'quick_scan') {
+    return {
+      rationale: 'Quick scan mode: Using Tavily search and integrated answer generation.',
+      steps: [
+        { 
+          id: '1', 
+          type: 'search', 
+          description: `Direct search and answer generation for: ${query}`,
+          searchQueries: [query]
+        }
+      ],
+    };
+  }
+
+  if (isMockMode()) {
+    return {
+      rationale: 'Mock mode enabled. Providing a default stable plan.',
+      steps: [
+        { 
+          id: '1', 
+          type: 'search', 
+          description: `Research: ${query}`,
+          searchQueries: [query]
+        },
+        { id: '2', type: 'analyze', description: 'Analyze results and synthesize findings.' },
+      ],
+    };
+  }
+
   const prompt = previousPlan && feedback 
     ? `Query: ${query}\nMode: ${mode}\n\nPREVIOUS PLAN:\n${JSON.stringify(previousPlan, null, 2)}\n\nUSER FEEDBACK:\n${feedback.map(f => `[${f.timestamp}] ${f.content}`).join('\n')}`
     : `Query: ${query}\nMode: ${mode}`;
 
   try {
     const { object } = await generateObject({
-      model: google('gemini-1.5-flash-latest'),
+      model: google(AI_MODELS.FLASH),
       schema: ResearchPlanSchema,
       prompt: prompt,
       system: SYSTEM_PROMPT,
@@ -43,17 +74,17 @@ export async function generatePlan(
 
     return object;
   } catch (error) {
-    console.warn('Failed to generate plan with Gemini, using fallback:', error);
+    console.error('Gemini Planning Error:', error);
     return {
-      rationale: 'Gemini is temporarily unavailable. Providing a default plan.',
+      rationale: 'Gemini API error occurred. Providing a default stable plan.',
       steps: [
         { 
           id: '1', 
           type: 'search', 
-          description: `Search for information about: ${query}`,
+          description: `Research: ${query}`,
           searchQueries: [query]
         },
-        { id: '2', type: 'analyze', description: 'Analyze the search results.' },
+        { id: '2', type: 'analyze', description: 'Analyze results and synthesize findings.' },
       ],
     };
   }

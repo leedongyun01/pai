@@ -71,6 +71,8 @@ Extracted content should be useful for analysis. The researcher should filter ou
 - **FR-005**: System MUST provide metadata for each piece of extracted content, including the source URL and page title.
 - **FR-006**: System MUST enforce a maximum content length of 20,000 characters per page to manage context window usage.
 - **FR-007**: System MUST be able to identify and skip non-textual or irrelevant file types (e.g., binary files, large images) if encountered.
+- **FR-008**: In 'Quick Scan' (Fast Search) mode, the Research Engine MUST utilize Tavily only for search and answer generation.
+- **FR-009**: In 'Deep Probe' (Deep Research) mode, the Research Engine MUST provide comprehensive results to support Gemini-based deep synthesis.
 
 ## Assumptions
 

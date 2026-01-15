@@ -16,21 +16,21 @@ export default async function Header() {
           {user ? (
             <>
               <Link href="/dashboard" className="text-sm font-medium text-gray-700 hover:text-blue-600">
-                Dashboard
+                대시보드
               </Link>
               <form action={logout}>
                 <button type="submit" className="text-sm font-medium text-gray-700 hover:text-red-600">
-                  Logout
+                  로그아웃
                 </button>
               </form>
             </>
           ) : (
             <>
               <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600">
-                Login
+                로그인
               </Link>
               <Link href="/signup" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-                Sign Up
+                회원가입
               </Link>
             </>
           )}

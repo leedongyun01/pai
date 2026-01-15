@@ -5,5 +5,4 @@ prompt = """
 2. clean up dead & old codes.\
 3. check if there in any overengineering.\
 4. check if Testing code covers overall > 80%
-5. commit, push, pr, merge
 """

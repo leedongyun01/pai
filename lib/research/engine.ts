@@ -103,18 +103,28 @@ export class ResearchEngine {
 
       const allResults = await Promise.all(researchTasks);
       
+      // Collect all potential candidates first
+      const candidates: ResearchResult[] = [];
       for (const batch of allResults) {
-        for (const result of batch) {
-          // FR-008: Relevance filtering
-          if (result.score < 0.3) continue;
+        candidates.push(...batch);
+      }
 
-          if (!resultsMap.has(result.url)) {
-            // FR-006: Enforce 20,000 character limit
-            if (result.content.length > 20000) {
-              result.content = result.content.substring(0, 20000) + "... [truncated]";
-            }
-            resultsMap.set(result.url, result);
+      // First pass: Strict filtering
+      let validResults = candidates.filter(r => r.score >= 0.3);
+
+      // Fallback: If strict filtering leaves us with nothing, use everything
+      if (validResults.length === 0 && candidates.length > 0) {
+        console.warn("Strict relevance filtering removed all results. Using low-confidence results as fallback.");
+        validResults = candidates;
+      }
+
+      for (const result of validResults) {
+        if (!resultsMap.has(result.url)) {
+          // FR-006: Enforce 20,000 character limit
+          if (result.content.length > 20000) {
+            result.content = result.content.substring(0, 20000) + "... [truncated]";
           }
+          resultsMap.set(result.url, result);
         }
       }
 

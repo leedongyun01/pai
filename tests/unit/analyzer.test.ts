@@ -16,6 +16,14 @@ vi.mock('@ai-sdk/google', () => ({
 }));
 
 describe('Analyzer Agent', () => {
+  beforeEach(() => {
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY = 'test-key';
+  });
+
+  afterEach(() => {
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  });
+
   it('should return a mode and rationale', async () => {
     const result = await analyzeQuery('What are the latest breakthroughs in quantum computing?');
     expect(result.mode).toBe('deep_probe');

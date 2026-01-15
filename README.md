@@ -21,6 +21,13 @@ curl -X PATCH http://localhost:3000/api/research/<id> \
   -d '{"action": "approve"}'
 ```
 
+## Adaptive Visualization
+ProbeAI automatically detects numerical trends and structural patterns in research reports and converts them into:
+- **Mermaid.js Charts**: Bar, Line, Pie, Flowcharts, Gantt, and Journey Maps.
+- **Markdown Tables**: For complex entity comparisons or large data sets.
+
+Visualizations are grounded in research data and include citations to source material.
+
 ## Getting Started
 
 First, run the development server:

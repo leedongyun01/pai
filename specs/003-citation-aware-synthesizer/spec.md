@@ -69,6 +69,8 @@ As a user, I want the system to identify and handle conflicting information from
 - **FR-005**: System MUST detect and explicitly report conflicting information from sources.
 - **FR-006**: System MUST use a hallucination-prevention logic that prevents making claims not supported by the input data.
 - **FR-007**: System MUST support hierarchical structuring within the report body (e.g., nested subsections).
+- **FR-008**: In 'Quick Scan' (Fast Search) mode, the system MUST use Tavily's generated answer directly, bypassing the full synthesis pipeline.
+- **FR-009**: In 'Deep Probe' (Deep Research) mode, the system MUST use Gemini for citation-aware synthesis and conflict resolution.
 
 ### Key Entities *(include if feature involves data)*
 

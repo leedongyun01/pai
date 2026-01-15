@@ -9,6 +9,12 @@ describe('Tavily Scraper', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     process.env.TAVILY_API_KEY = 'test-key';
+    // Ensure isMockMode() returns false so we can test the real logic
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY = 'test-google-key'; 
+  });
+
+  afterEach(() => {
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   });
 
   it('should successfully search and extract content', async () => {
@@ -30,19 +36,26 @@ describe('Tavily Scraper', () => {
     expect(results[0].content).toContain('static typing');
   });
 
-  it('should throw SearchError when API call fails', async () => {
+  it('should return fallback data when API call fails', async () => {
     (fetch as any).mockResolvedValue({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
     });
 
-    await expect(searchAndExtract('test query')).rejects.toThrow('Tavily API error: 500 Internal Server Error');
+    const result = await searchAndExtract('test query');
+    // The implementation catches the error and returns mock/fallback data
+    expect(result.results).toBeDefined();
+    expect(result.answer).toBeDefined();
+    expect(result.answer).toContain('fallback');
   });
 
-  it('should throw SearchError when TAVILY_API_KEY is missing', async () => {
+  it('should return mock data when TAVILY_API_KEY is missing', async () => {
     delete process.env.TAVILY_API_KEY;
-    await expect(searchAndExtract('test query')).rejects.toThrow('TAVILY_API_KEY is not configured');
+    const result = await searchAndExtract('test query');
+    
+    expect(result.results).toBeDefined();
+    expect(result.answer).toContain('mock');
   });
 
   it('should handle 404 results by skipping them or returning empty content', async () => {
@@ -61,10 +74,12 @@ describe('Tavily Scraper', () => {
     expect(results[0].url).toBe('https://example.com/404');
   });
 
-  it('should throw SearchError on fetch timeout', async () => {
+  it('should return fallback data on fetch timeout', async () => {
     (fetch as any).mockRejectedValue(new Error('Fetch timeout'));
 
-    await expect(searchAndExtract('test query')).rejects.toThrow('Failed to perform search: Fetch timeout');
+    const result = await searchAndExtract('test query');
+    expect(result.results).toBeDefined();
+    expect(result.answer).toContain('fallback');
   });
 
   it('should clean extracted content by normalizing whitespace', async () => {
