@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSession } from '@/lib/orchestrator';
-import { listSessions, deleteSession } from '@/lib/storage/session-store';
 import { createClient } from '@/lib/supabase/server';
 import { ResearchSession } from '@/lib/types/session';
 
@@ -40,9 +39,7 @@ export async function GET() {
       return NextResponse.json(mappedDbSessions);
     }
 
-    // If not logged in, return local sessions as usual
-    const sessions = await listSessions();
-    return NextResponse.json(sessions);
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   } catch (error) {
     console.error('Failed to list sessions:', error);
     return NextResponse.json(
@@ -61,6 +58,10 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
     // Passing userId ensures it's saved to DB via saveSession sync logic
     const session = await createSession(query, { 

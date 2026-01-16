@@ -17,6 +17,10 @@ export async function createSession(query: string, options?: { autoPilot?: boole
     throw new Error('Query is too short or empty');
   }
 
+  if (!options?.userId) {
+    throw new Error('User authentication is required to start research');
+  }
+
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   
