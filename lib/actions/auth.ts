@@ -75,7 +75,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect('/dashboard')
+  redirect('/account')
 }
 
 export async function logout() {
