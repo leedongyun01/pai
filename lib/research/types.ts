@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VisualizationObject } from "./schemas";
 
 /**
  * Operational modes for the Research Engine

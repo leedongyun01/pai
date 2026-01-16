@@ -62,9 +62,9 @@ export class ResearchEngine {
       throw new ResearchError("No plan found in session", "NO_PLAN");
     }
 
-    const updatedSession = { 
+    const updatedSession: ResearchSession = { 
       ...session, 
-      status: "executing" as const,
+      status: "executing",
       updatedAt: new Date().toISOString()
     };
     
@@ -73,7 +73,7 @@ export class ResearchEngine {
       updatedSession.results.forEach(r => resultsMap.set(r.url, r));
     }
 
-    const searchSteps = updatedSession.plan.steps.filter(s => s.type === 'search');
+    const searchSteps = updatedSession.plan?.steps.filter(s => s.type === 'search') || [];
     let capturedAnswer: string | undefined;
 
     for (const step of searchSteps) {

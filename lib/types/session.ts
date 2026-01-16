@@ -1,4 +1,4 @@
-import { Report } from "../research/types";
+import { Report, VisualizationObject } from "../research/types";
 
 export type ResearchMode = 'quick_scan' | 'deep_probe';
 
@@ -37,7 +37,7 @@ export interface UserFeedback {
 }
 
 export interface ResearchResult {
-  id: string;
+  id?: string;
   url: string;
   title: string;
   content: string;
@@ -57,6 +57,7 @@ export interface ResearchSession {
   plan?: ResearchPlan;
   results?: ResearchResult[];
   report?: Report;
+  visualizations?: VisualizationObject[];
   tavilyAnswer?: string;
   createdAt: string; // ISO Date
   updatedAt: string; // ISO Date

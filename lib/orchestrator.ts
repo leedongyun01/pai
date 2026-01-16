@@ -1,4 +1,5 @@
 import { ResearchSession, ResearchStatus, ResearchMode } from './types/session';
+import { VisualizationObject } from './research/types';
 import { saveSession, getSession } from './storage/session-store';
 import crypto from 'node:crypto';
 import { analyzeQuery } from './agents/analyzer';
@@ -163,7 +164,7 @@ export async function executeResearch(id: string): Promise<ResearchSession> {
     const report = await synthesizer.synthesize(id);
     
     // FR-006: Adaptive Visualization - Process each section for visualizations
-    const visualizations = [];
+    const visualizations: (VisualizationObject & { sectionTitle: string })[] = [];
     // Only run visualization for deep_probe mode to avoid Gemini usage in quick_scan
     if (session.mode === 'deep_probe' && report && report.sections) {
       for (const section of report.sections) {
