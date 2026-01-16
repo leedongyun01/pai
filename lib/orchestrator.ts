@@ -1,6 +1,6 @@
 import { ResearchSession, ResearchStatus, ResearchMode } from './types/session';
 import { saveSession, getSession } from './storage/session-store';
-import { crypto } from 'node:crypto';
+import crypto from 'node:crypto';
 import { analyzeQuery } from './agents/analyzer';
 import { generatePlan } from './agents/planner';
 import { ResearchEngine } from './research/engine';
@@ -16,7 +16,7 @@ export async function createSession(query: string, options?: { autoPilot?: boole
     throw new Error('Query is too short or empty');
   }
 
-  const id = (globalThis.crypto || crypto).randomUUID();
+  const id = crypto.randomUUID();
   const now = new Date().toISOString();
   
   let session: ResearchSession = {
