@@ -19,6 +19,7 @@ function mapDbToSession(db: any): ResearchSession {
     results: context.results,
     report: context.report,
     visualizations: context.visualizations,
+    tavilyAnswer: context.tavilyAnswer,
     error: context.error,
     feedbackHistory: context.feedbackHistory
   };
@@ -43,6 +44,7 @@ export async function saveSession(session: ResearchSession): Promise<void> {
       report: session.report,
       feedbackHistory: session.feedbackHistory,
       visualizations: session.visualizations,
+      tavilyAnswer: session.tavilyAnswer,
       mode: session.mode,
       autoPilot: session.autoPilot,
       error: session.error

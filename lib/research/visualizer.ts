@@ -29,7 +29,10 @@ export class Visualizer implements IVisualizer {
 
       // Assign IDs, apply gates, and handle fallbacks
       return object.visualizations
-        .filter((v) => v.confidence >= 0.8) // Confidence Gate (FR-010)
+        .filter((v) => {
+          console.log(`[Visualizer] Pattern: ${v.type}, Confidence: ${v.confidence}`);
+          return true; // Proceed regardless of confidence as requested by user
+        }) // Confidence Gate (FR-010) bypassed
         .map((v) => {
           let type = v.type;
           let code = v.code;

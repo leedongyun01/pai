@@ -73,7 +73,8 @@ export class Synthesizer {
       // Fallback: If Tavily didn't provide an answer, construct one from the search snippets
       if (!summaryContent && session.results && session.results.length > 0) {
         console.log("Tavily answer missing, generating fallback summary from snippets.");
-                summaryContent = (session.results || []).slice(0, 3).map((r, i) => `**${r.title}**\n${r.content.substring(0, 300)}...`).join("\n\n");      }
+        summaryContent = (session.results || []).slice(0, 3).map((r, i) => `**${r.title}**\n${r.content.substring(0, 300)}...`).join("\n\n");
+      }
 
       const report: Report = {
         id: crypto.randomUUID(),
