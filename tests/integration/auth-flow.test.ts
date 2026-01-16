@@ -39,7 +39,7 @@ describe('Auth Flow: Login Integration', () => {
       email: 'test@example.com',
       password: 'password123',
     })
-    expect(redirect).toHaveBeenCalledWith('/dashboard')
+    expect(redirect).toHaveBeenCalledWith('/dashboard/account')
   })
 
   it('should return error on invalid credentials', async () => {

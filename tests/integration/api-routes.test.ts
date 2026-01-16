@@ -1,16 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as orchestrator from '@/lib/orchestrator';
 import * as sessionStore from '@/lib/storage/session-store';
+import { createClient } from '@/lib/supabase/server';
 import { GET, POST } from '@/app/api/research/route';
 import { GET as GET_BY_ID } from '@/app/api/research/[id]/route';
 import { NextRequest } from 'next/server';
 
 vi.mock('@/lib/orchestrator');
 vi.mock('@/lib/storage/session-store');
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(),
+}));
 
 describe('API Routes: /api/research', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    } as any);
   });
 
   it('GET should list sessions', async () => {

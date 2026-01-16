@@ -43,4 +43,5 @@ lib/
 - **003-citation-aware-synthesizer**: Designed citation-aware synthesis engine with hallucination prevention and multi-pass verification.
 
 <!-- MANUAL ADDITIONS START -->
+- **007-update-account-settings**: Migrated user information from dashboard to settings page, renamed the settings route to `/dashboard/account` (계정 설정), and deleted the redundant dashboard page.
 <!-- MANUAL ADDITIONS END -->

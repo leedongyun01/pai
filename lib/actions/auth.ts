@@ -75,7 +75,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect('/dashboard')
+  redirect('/dashboard/account')
 }
 
 export async function logout() {
@@ -90,6 +90,28 @@ export async function signInWithGitHub() {
     provider: 'github',
     options: {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  if (data.url) {
+    redirect(data.url)
+  }
+}
+
+export async function signInWithGoogle() {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'select_account',
+      },
     },
   })
 
