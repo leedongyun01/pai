@@ -10,15 +10,13 @@ export async function saveSession(session: ResearchSession): Promise<void> {
   await fs.mkdir(STORAGE_DIR, { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(session, null, 2), 'utf-8');
 
-  // Sync to Supabase if possible
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (user) {
+  // Sync to Supabase only if it's an authenticated session
+  if (session.userId) {
+    try {
+      const supabase = await createClient();
       await supabase.from('research_sessions').upsert({
         id: session.id,
-        user_id: user.id,
+        user_id: session.userId,
         topic: session.query,
         status: session.status,
         context: {
@@ -33,10 +31,10 @@ export async function saveSession(session: ResearchSession): Promise<void> {
         },
         updated_at: new Date().toISOString()
       });
+    } catch (error) {
+      // Fail silently for DB sync to not break the main flow
+      console.error('Failed to sync session to DB:', error);
     }
-  } catch (error) {
-    // Fail silently for DB sync to not break the main flow
-    // console.error('Failed to sync session to DB:', error);
   }
 }
 
