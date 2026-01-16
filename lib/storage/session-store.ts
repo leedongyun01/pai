@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { ResearchSession } from '../types/session';
+import { createClient } from '../supabase/server';
 
 const STORAGE_DIR = path.join(process.cwd(), '.data', 'sessions');
 
@@ -8,6 +9,35 @@ export async function saveSession(session: ResearchSession): Promise<void> {
   const filePath = path.join(STORAGE_DIR, `${session.id}.json`);
   await fs.mkdir(STORAGE_DIR, { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(session, null, 2), 'utf-8');
+
+  // Sync to Supabase if possible
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      await supabase.from('research_sessions').upsert({
+        id: session.id,
+        user_id: user.id,
+        topic: session.query,
+        status: session.status,
+        context: {
+          plan: session.plan,
+          results: session.results,
+          report: session.report,
+          feedbackHistory: (session as any).feedbackHistory,
+          visualizations: (session as any).visualizations,
+          mode: session.mode,
+          autoPilot: session.autoPilot,
+          error: session.error
+        },
+        updated_at: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    // Fail silently for DB sync to not break the main flow
+    // console.error('Failed to sync session to DB:', error);
+  }
 }
 
 export async function getSession(id: string): Promise<ResearchSession | null> {

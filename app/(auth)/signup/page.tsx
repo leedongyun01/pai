@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { signup } from '@/lib/actions/auth'
-import Link from 'link'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { SocialAuth } from '@/components/auth/social-auth'
