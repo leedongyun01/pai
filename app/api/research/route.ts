@@ -43,7 +43,7 @@ export async function GET() {
   } catch (error) {
     console.error('Failed to list sessions:', error);
     return NextResponse.json(
-      { error: 'Failed to list sessions' }, 
+      { error: 'Failed to list sessions' },
       { status: 500 }
     );
   }
@@ -64,17 +64,17 @@ export async function POST(req: NextRequest) {
     }
 
     // Passing userId ensures it's saved to DB via saveSession sync logic
-    const session = await createSession(query, { 
-      autoPilot, 
-      mode, 
-      userId: user?.id 
+    const session = await createSession(query, {
+      autoPilot,
+      mode,
+      userId: user?.id
     });
-    
+
     return NextResponse.json(session, { status: 201 });
   } catch (error) {
     console.error('Error creating session:', error);
     return NextResponse.json(
-      { error: (error as Error).message || 'Internal Server Error' }, 
+      { error: (error as Error).message || 'Internal Server Error' },
       { status: 500 }
     );
   }

@@ -109,14 +109,13 @@ export class ResearchEngine {
         candidates.push(...batch);
       }
 
-      // First pass: Strict filtering
-      let validResults = candidates.filter(r => r.score >= 0.3);
+      // Log scores for debugging
+      candidates.forEach(r => {
+        console.log(`[ResearchEngine] Candidate URL: ${r.url}, Score: ${r.score}`);
+      });
 
-      // Fallback: If strict filtering leaves us with nothing, use everything
-      if (validResults.length === 0 && candidates.length > 0) {
-        console.warn("Strict relevance filtering removed all results. Using low-confidence results as fallback.");
-        validResults = candidates;
-      }
+      // Process all results regardless of score as requested by user
+      let validResults = candidates;
 
       for (const result of validResults) {
         if (!resultsMap.has(result.url)) {

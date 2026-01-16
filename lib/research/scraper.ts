@@ -55,6 +55,11 @@ export async function searchAndExtract(
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+      // Match lib_example behavior: Only add suffix for basic search to get better answers
+      const finalQuery = options.searchDepth === "basic" 
+        ? `${query} (답변은 한국어로, 아주 구체적이고 상세하게 길게 작성해줘)` 
+        : query;
+
       const response = await fetch("https://api.tavily.com/search", {
         method: "POST",
         headers: {
@@ -63,11 +68,9 @@ export async function searchAndExtract(
         signal: controller.signal,
         body: JSON.stringify({
           api_key: apiKey,
-          query: options.searchDepth === "basic" ? `${query} (답변은 한국어로, 아주 구체적이고 상세하게 길게 작성해줘)` : query,
+          query: finalQuery,
           search_depth: options.searchDepth || "basic",
-          include_answer: true, 
-          include_images: false,
-          include_raw_content: false, 
+          include_answer: true,
           max_results: options.maxResults || 5,
         }),
       });
@@ -82,6 +85,12 @@ export async function searchAndExtract(
       }
 
       const data = await response.json();
+      
+      // Log raw response for certain information (No speculation)
+      console.log("--- TAVILY RAW RESPONSE START ---");
+      console.log(JSON.stringify(data, null, 2));
+      console.log("--- TAVILY RAW RESPONSE END ---");
+
       const results = (data.results || [])
         .filter((res: any) => {
           const binaryExtensions = ['.pdf', '.zip', '.exe', '.dmg', '.mp4', '.mp3', '.jpg', '.png'];
