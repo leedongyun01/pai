@@ -11,7 +11,7 @@ const engine = new ResearchEngine();
 const synthesizer = new Synthesizer();
 const visualizer = new Visualizer();
 
-export async function createSession(query: string, options?: { autoPilot?: boolean; mode?: ResearchMode }): Promise<ResearchSession> {
+export async function createSession(query: string, options?: { autoPilot?: boolean; mode?: ResearchMode; userId?: string }): Promise<ResearchSession> {
   if (!query || query.trim().length < 3) {
     throw new Error('Query is too short or empty');
   }
@@ -21,6 +21,7 @@ export async function createSession(query: string, options?: { autoPilot?: boole
   
   let session: ResearchSession = {
     id,
+    userId: options?.userId,
     query,
     mode: options?.mode || 'quick_scan',
     status: 'analyzing',

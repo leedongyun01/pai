@@ -10,36 +10,7 @@ export async function GET() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-      // 1. Migrate local sessions to DB if they exist
-      const localSessions = await listSessions();
-      for (const session of localSessions) {
-        const { error } = await supabase.from('research_sessions').upsert({
-          id: session.id,
-          user_id: user.id,
-          topic: session.query,
-          status: session.status,
-          context: {
-            plan: session.plan,
-            results: session.results,
-            report: session.report,
-            visualizations: (session as any).visualizations,
-            mode: session.mode,
-            autoPilot: session.autoPilot,
-            error: session.error,
-            feedbackHistory: (session as any).feedbackHistory
-          },
-          updated_at: new Date().toISOString()
-        });
-
-        if (!error) {
-          // 2. Delete local file after successful migration
-          await deleteSession(session.id);
-        } else {
-          console.error(`Failed to migrate session ${session.id}:`, error);
-        }
-      }
-
-      // 3. Fetch from DB only
+      // Fetch from DB only
       const { data: dbSessions, error } = await supabase
         .from('research_sessions')
         .select('*')
@@ -88,8 +59,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    // createSession already calls saveSession, which now handles DB sync
-    const session = await createSession(query, { autoPilot, mode });
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Passing userId ensures it's saved to DB via saveSession sync logic
+    const session = await createSession(query, { 
+      autoPilot, 
+      mode, 
+      userId: user?.id 
+    });
     
     return NextResponse.json(session, { status: 201 });
   } catch (error) {

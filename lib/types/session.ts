@@ -48,6 +48,7 @@ export interface ResearchResult {
 
 export interface ResearchSession {
   id: string;
+  userId?: string; // Owner ID for DB sessions
   query: string;
   mode: ResearchMode;
   status: ResearchStatus;
