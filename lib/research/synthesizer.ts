@@ -1,5 +1,6 @@
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
+import crypto from 'node:crypto';
 import { ReportSchema, ConflictSchema } from "./schemas";
 import { Report, Conflict } from "./types";
 import { getSession, saveSession } from "../storage/session-store";
