@@ -1,87 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ProbeAI: Autonomous Deep Research Engine
 
-## API Usage
+**ProbeAI** is a sophisticated, autonomous AI agent designed to transform complex queries into comprehensive, citation-backed research reports. By leveraging advanced orchestration and multi-step reasoning, it automates the entire research process—from initial analysis and strategic planning to real-time web exploration and multi-dimensional data synthesis.
 
-### Create a Research Session
-```bash
-curl -X POST http://localhost:3000/api/research \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Future of AI in healthcare"}'
-```
+---
 
-### Check Session Status
-```bash
-curl http://localhost:3000/api/research/<id>
-```
+## 🚀 Key Features
 
-### Approve Research Plan
-```bash
-curl -X PATCH http://localhost:3000/api/research/<id> \
-  -H "Content-Type: application/json" \
-  -d '{"action": "approve"}'
-```
+### 1. Dual-Mode Research Strategy
+- **Quick Scan**: Rapidly summarizes information from 3-5 high-quality sources for immediate insights.
+- **Deep Probe**: Activates a multi-stage reasoning engine to cross-verify conflicting information and generate in-depth analytical reports.
 
-## Adaptive Visualization
-ProbeAI automatically detects numerical trends and structural patterns in research reports and converts them into:
-- **Mermaid.js Charts**: Bar, Line, Pie, Flowcharts, Gantt, and Journey Maps.
-- **Markdown Tables**: For complex entity comparisons or large data sets.
+### 2. Hybrid Human-in-the-Loop
+- **Auto-Pilot Mode**: Fully automated execution from planning to final report generation.
+- **Plan Confirmation Mode**: Allows users to review and refine the research sub-tasks before the agent begins its deep dive, ensuring perfect alignment with user intent.
 
-Visualizations are grounded in research data and include citations to source material.
+### 3. Smart Content Synthesis
+- **Adaptive Visualization**: Automatically detects numerical trends and structural patterns to generate **Mermaid.js charts** (Bar, Line, Pie, Gantt) and **Markdown tables**.
+- **Citation-Aware Reporting**: Every claim is grounded in source material with inline citations and a structured bibliography to prevent hallucinations.
 
-## Getting Started
+### 4. Real-time Status Tracking
+- A dynamic dashboard provides real-time visibility into the agent's internal state: **Thinking, Planning, Searching, and Synthesizing**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠 Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **AI Orchestration**: [Vercel AI SDK](https://sdk.vercel.ai/)
+- **Large Language Models**: Google Gemini 1.5 Pro / Flash
+- **Search Engine**: [Tavily API](https://tavily.com/) (AI-optimized search)
+- **Database & Auth**: [Supabase](https://supabase.com/)
+- **Visualization**: Mermaid.js, Tailwind CSS
+- **Testing**: Vitest
 
-## Authentication
+---
 
-ProbeAI uses Supabase Auth for user management.
+## 🏗 Architectural Overview
 
-### Features
-- Email/Password Signup and Login
-- GitHub OAuth Integration
-- Secure Session Management via Cookies
-- Automatic User Profile Creation (via DB Triggers)
+ProbeAI follows a modular agentic architecture:
 
-### Environment Variables
-To enable authentication, ensure the following variables are set in your `.env.local`:
-```env
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
+1.  **Analyzer**: Deconstructs complex user queries and determines the optimal research strategy.
+2.  **Planner**: Breaks down the research goal into granular, executable sub-tasks and search queries.
+3.  **Researcher**: Executes parallelized web searches and scrapes high-relevance content.
+4.  **Synthesizer**: De-duplicates information, performs fact-checking, and structures the final narrative.
+5.  **Visualizer**: Identifies data patterns and injects appropriate visual components into the report.
 
-### Protected Routes
-Routes under `app/(protected)/` (like `/dashboard`) are automatically protected by Next.js Middleware. Unauthenticated users will be redirected to `/login`.
+---
 
-## API Usage
+## 🚦 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 18+
+- Supabase Project
+- Tavily API Key
+- Google Gemini API Key
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
 
-## Learn More
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/leedongyun01/pai.git
+   cd pai
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Configure Environment Variables:
+   Create a `.env.local` file:
+   ```env
+   GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_key
+   TAVILY_API_KEY=your_tavily_key
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+This project is licensed under the MIT License.
