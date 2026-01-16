@@ -15,8 +15,8 @@ export default async function Header() {
         <nav className="flex items-center space-x-4">
           {user ? (
             <>
-              <Link href="/dashboard" className="text-sm font-medium text-gray-700 hover:text-blue-600">
-                대시보드
+              <Link href="/dashboard/account" className="text-sm font-medium text-gray-700 hover:text-blue-600">
+                계정 설정
               </Link>
               <form action={logout}>
                 <button type="submit" className="text-sm font-medium text-gray-700 hover:text-red-600">
