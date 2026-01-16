@@ -14,7 +14,7 @@ export function reportToMarkdown(report: Report): string {
     // Add content with citation markers
     let content = section.content;
     if (section.citations.length > 0) {
-      const markers = section.citations.map(c => `[${c}]`).join(" ");
+      const markers = section.citations.map((c: string) => `[${c}]`).join(" ");
       content += `\n\n*출처: ${markers}*`;
     }
     markdown += `${content}\n\n`;
