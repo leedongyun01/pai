@@ -1,5 +1,33 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## API Usage
+
+### Create a Research Session
+```bash
+curl -X POST http://localhost:3000/api/research \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Future of AI in healthcare"}'
+```
+
+### Check Session Status
+```bash
+curl http://localhost:3000/api/research/<id>
+```
+
+### Approve Research Plan
+```bash
+curl -X PATCH http://localhost:3000/api/research/<id> \
+  -H "Content-Type: application/json" \
+  -d '{"action": "approve"}'
+```
+
+## Adaptive Visualization
+ProbeAI automatically detects numerical trends and structural patterns in research reports and converts them into:
+- **Mermaid.js Charts**: Bar, Line, Pie, Flowcharts, Gantt, and Journey Maps.
+- **Markdown Tables**: For complex entity comparisons or large data sets.
+
+Visualizations are grounded in research data and include citations to source material.
+
 ## Getting Started
 
 First, run the development server:
@@ -15,6 +43,29 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Authentication
+
+ProbeAI uses Supabase Auth for user management.
+
+### Features
+- Email/Password Signup and Login
+- GitHub OAuth Integration
+- Secure Session Management via Cookies
+- Automatic User Profile Creation (via DB Triggers)
+
+### Environment Variables
+To enable authentication, ensure the following variables are set in your `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### Protected Routes
+Routes under `app/(protected)/` (like `/dashboard`) are automatically protected by Next.js Middleware. Unauthenticated users will be redirected to `/login`.
+
+## API Usage
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

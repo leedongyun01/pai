@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: Citation-Aware Synthesizer API
+  version: 1.0.0
+paths:
+  /api/research/{id}/synthesize:
+    post:
+      summary: Trigger report synthesis for a research session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [quick, deep]
+                  default: quick
+      responses:
+        '200':
+          description: Synthesis result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Session not found
+
+components:
+  schemas:
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportSection'
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+    ReportSection:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        citations:
+          type: array
+          items:
+            type: string
+        subsections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportSection'
+    Source:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        title:
+          type: string

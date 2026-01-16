@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: Plan Confirmation API
+  version: 1.0.0
+paths:
+  /api/research/{id}/approve:
+    post:
+      summary: Approve the research plan and start execution
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Session transitioned to executing
+  /api/research/{id}/feedback:
+    post:
+      summary: Provide feedback to regenerate the research plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: string
+      responses:
+        200:
+          description: Planning restarted
+  /api/research/{id}/modify:
+    post:
+      summary: Manually modify plan steps (Add/Remove/Edit)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PlanStep'
+      responses:
+        200:
+          description: Plan updated
+  /api/research/{id}/settings:
+    patch:
+      summary: Update session settings (e.g., Auto-Pilot)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                autoPilot:
+                  type: boolean
+      responses:
+        200:
+          description: Settings updated
+
+components:
+  schemas:
+    PlanStep:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [search, analyze]
+        description:
+          type: string
+        searchQueries:
+          type: array
+          items:
+            type: string

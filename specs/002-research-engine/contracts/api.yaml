@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: ProbeAI Research Engine API
+  version: 1.0.0
+paths:
+  /api/research/{id}/execute:
+    post:
+      summary: Execute research for a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [quick_scan, deep_probe]
+                  default: quick_scan
+      responses:
+        '202':
+          description: Research started
+        '400':
+          description: Invalid session or queries
+          
+  /api/research/{id}:
+    get:
+      summary: Get research results and status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchSession'
+
+components:
+  schemas:
+    ResearchSession:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResearchResult'
+    ResearchResult:
+      type: object
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        score:
+          type: number

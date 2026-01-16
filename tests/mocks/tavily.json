@@ -1,0 +1,20 @@
+{
+  "query": "benefits of typescript",
+  "results": [
+    {
+      "title": "Why TypeScript is great",
+      "url": "https://example.com/typescript-benefits",
+      "content": "TypeScript adds static typing to JavaScript, improving developer productivity and code quality...",
+      "score": 0.98,
+      "raw_content": "<html><body><h1>Why TypeScript is great</h1><p>TypeScript adds static typing to JavaScript, improving developer productivity and code quality...</p></body></html>"
+    },
+    {
+      "title": "TypeScript vs JavaScript",
+      "url": "https://another-example.org/ts-vs-js",
+      "content": "Comparing TypeScript and JavaScript features. TS offers better tooling and error detection at compile time.",
+      "score": 0.92,
+      "raw_content": "<html><body><h1>TypeScript vs JavaScript</h1><p>Comparing TypeScript and JavaScript features. TS offers better tooling and error detection at compile time.</p></body></html>"
+    }
+  ],
+  "response_time": 0.45
+}
