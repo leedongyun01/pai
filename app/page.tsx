@@ -2,22 +2,30 @@
 
 import { useState, useEffect } from 'react';
 import { ResearchSession } from '@/lib/types/session';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export default function Home() {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'quick_scan' | 'deep_probe'>('quick_scan');
   const [sessions, setSessions] = useState<ResearchSession[]>([]);
   const [activeSession, setActiveSession] = useState<ResearchSession | null>(null);
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState('');
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
     fetchSessions();
   }, []);
 
   const fetchSessions = async () => {
     try {
       const res = await fetch('/api/research');
+      if (res.status === 401) return;
       const data = await res.json();
       if (Array.isArray(data)) {
         setSessions(data);
@@ -31,6 +39,13 @@ export default function Home() {
     e.preventDefault();
     if (!query.trim()) return;
 
+    if (!user) {
+      if (confirm('리서치를 시작하려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
+        router.push('/login');
+      }
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('/api/research', {
@@ -38,12 +53,18 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query, mode }),
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || '리서치 시작에 실패했습니다.');
+      }
+      
       const data = await res.json();
       setActiveSession(data);
       setQuery('');
       fetchSessions();
     } catch (error) {
-      alert('리서치 시작에 실패했습니다.');
+      alert((error as Error).message);
     } finally {
       setLoading(false);
     }

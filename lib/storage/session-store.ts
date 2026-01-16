@@ -1,84 +1,104 @@
-import fs from 'fs/promises';
-import path from 'path';
 import { ResearchSession } from '../types/session';
 import { createClient } from '../supabase/server';
 
-const STORAGE_DIR = path.join(process.cwd(), '.data', 'sessions');
+/**
+ * Maps a database row to a ResearchSession object
+ */
+function mapDbToSession(db: any): ResearchSession {
+  const context = db.context || {};
+  return {
+    id: db.id,
+    userId: db.user_id,
+    query: db.topic,
+    status: db.status as any,
+    createdAt: db.created_at,
+    updatedAt: db.updated_at,
+    mode: context.mode || 'quick_scan',
+    autoPilot: context.autoPilot ?? true,
+    plan: context.plan,
+    results: context.results,
+    report: context.report,
+    visualizations: context.visualizations,
+    error: context.error,
+    feedbackHistory: context.feedbackHistory
+  };
+}
 
 export async function saveSession(session: ResearchSession): Promise<void> {
-  const filePath = path.join(STORAGE_DIR, `${session.id}.json`);
-  await fs.mkdir(STORAGE_DIR, { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(session, null, 2), 'utf-8');
+  // We can only save to DB if userId is present due to RLS and schema
+  if (!session.userId) {
+    console.warn('Attempted to save session without userId in Vercel environment. This session will be ephemeral.');
+    return;
+  }
 
-  // Sync to Supabase only if it's an authenticated session
-  if (session.userId) {
-    try {
-      const supabase = await createClient();
-      await supabase.from('research_sessions').upsert({
-        id: session.id,
-        user_id: session.userId,
-        topic: session.query,
-        status: session.status,
-        context: {
-          plan: session.plan,
-          results: session.results,
-          report: session.report,
-          feedbackHistory: (session as any).feedbackHistory,
-          visualizations: (session as any).visualizations,
-          mode: session.mode,
-          autoPilot: session.autoPilot,
-          error: session.error
-        },
-        updated_at: new Date().toISOString()
-      });
-    } catch (error) {
-      // Fail silently for DB sync to not break the main flow
-      console.error('Failed to sync session to DB:', error);
-    }
+  const supabase = await createClient();
+  const { error } = await supabase.from('research_sessions').upsert({
+    id: session.id,
+    user_id: session.userId,
+    topic: session.query,
+    status: session.status,
+    context: {
+      plan: session.plan,
+      results: session.results,
+      report: session.report,
+      feedbackHistory: session.feedbackHistory,
+      visualizations: session.visualizations,
+      mode: session.mode,
+      autoPilot: session.autoPilot,
+      error: session.error
+    },
+    updated_at: new Date().toISOString()
+  });
+
+  if (error) {
+    console.error('Failed to sync session to DB:', error);
+    throw new Error(`Database sync failed: ${error.message}`);
   }
 }
 
 export async function getSession(id: string): Promise<ResearchSession | null> {
-  const filePath = path.join(STORAGE_DIR, `${id}.json`);
-  try {
-    const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data) as ResearchSession;
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return null;
-    }
-    throw error;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('research_sessions')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    return null;
   }
+
+  return mapDbToSession(data);
 }
 
 export async function listSessions(): Promise<ResearchSession[]> {
-  try {
-    const files = await fs.readdir(STORAGE_DIR);
-    const sessions: ResearchSession[] = [];
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const data = await fs.readFile(path.join(STORAGE_DIR, file), 'utf-8');
-        sessions.push(JSON.parse(data) as ResearchSession);
-      }
-    }
-    return sessions.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return [];
-    }
-    throw error;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('research_sessions')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !data) {
+    return [];
   }
+
+  return data.map(mapDbToSession);
 }
 
 export async function deleteSession(id: string): Promise<void> {
-  const filePath = path.join(STORAGE_DIR, `${id}.json`);
-  try {
-    await fs.unlink(filePath);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      throw error;
-    }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('research_sessions')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Failed to delete session from DB:', error);
+    throw new Error(`Database delete failed: ${error.message}`);
   }
 }
